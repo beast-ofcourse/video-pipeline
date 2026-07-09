@@ -6,6 +6,9 @@
   "scripts": {
     "test": "vitest run"
   },
+  "dependencies": {
+    "@opencode/video-engine": "^0.1.0"
+  },
   "devDependencies": {
     "typescript": "^5.5.0"
   }
