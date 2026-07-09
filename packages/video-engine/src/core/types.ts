@@ -16,8 +16,10 @@ export interface Transform {
   position: Position
   rotation: number
   scale: { x: number; y: number }
-  opacity: number
 }
+
+// SceneNode.opacity is the authoritative opacity value.
+// Transform handles spatial properties only (position, rotation, scale).
 
 export interface Constraints {
   anchor?: 'top-left' | 'top-center' | 'top-right' | 'center' |
