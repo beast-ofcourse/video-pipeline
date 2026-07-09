@@ -20,8 +20,8 @@ mode: always
 ## Motion Design Skills
 
 Load from `.opencode/skills/`:
-- motion-design.skill.md — animation principles
-- visual-composition.skill.md — composition rules
-- cinematography.skill.md — camera techniques
-- typography-motion.skill.md — kinetic typography
-- attention-psychology.skill.md — retention patterns
+- motion-design/SKILL.md — animation principles
+- visual-composition/SKILL.md — composition rules
+- cinematography/SKILL.md — camera techniques
+- typography-motion/SKILL.md — kinetic typography
+- attention-psychology/SKILL.md — retention patterns
