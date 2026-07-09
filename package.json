@@ -1,6 +1,6 @@
 {
   "name": "@beast-course/video-pipeline",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Autonomous, production-grade video generation pipeline for OpenCode — scene graph engine, motion library, 5-agent orchestration, and 3-layer QA",
   "workspaces": [
     "packages/*"
