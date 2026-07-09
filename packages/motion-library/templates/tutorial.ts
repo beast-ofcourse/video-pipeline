@@ -1,0 +1,313 @@
+import { SceneGraph } from '../../video-engine/src/core/types'
+
+export interface TutorialStep {
+  title: string
+  code?: string
+  explanation: string
+}
+
+export interface TutorialParams {
+  title: string
+  subtitle: string
+  steps: TutorialStep[]
+  brandColor: string
+  outroText?: string
+}
+
+export function createTutorial(params: TutorialParams): Partial<SceneGraph> {
+  return {
+    scenes: [
+      {
+        id: 'intro',
+        duration: 3,
+        fps: 30,
+        camera: {
+          type: 'perspective',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          zoom: 1,
+          focalLength: 50,
+        },
+        nodes: [
+          {
+            id: 'intro-bg',
+            type: 'rect',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', maxWidth: '100%', maxHeight: '100%' },
+            animations: [],
+            effects: [{ type: 'gradient-overlay', params: { colors: ['#0A0A0A', params.brandColor], opacity: 0.3 }, order: 0 }],
+            metadata: { color: '#0A0A0A' },
+          },
+          {
+            id: 'intro-badge',
+            type: 'rect',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: -100 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', alignment: 'center' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 0, value: 0 }, { frame: 15, value: 1 }] },
+            ],
+            effects: [],
+            metadata: { color: params.brandColor, width: 120, height: 28, borderRadius: 14 },
+          },
+          {
+            id: 'intro-badge-text',
+            type: 'text',
+            children: [],
+            parent: 'intro-badge',
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 2,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', alignment: 'center' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 10, value: 0 }, { frame: 20, value: 1 }] },
+            ],
+            effects: [],
+            metadata: { content: 'TUTORIAL', fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: 2 },
+          },
+          {
+            id: 'intro-title',
+            type: 'text',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 2,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', alignment: 'center', maxWidth: '80%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 5, value: 0 }, { frame: 25, value: 1 }] },
+              { property: 'position', keyframes: [{ frame: 5, value: [0, 20] }, { frame: 25, value: [0, 0] }] },
+            ],
+            effects: [],
+            metadata: { content: params.title, fontSize: 48, fontWeight: 800, color: '#fff' },
+          },
+          {
+            id: 'intro-subtitle',
+            type: 'text',
+            children: [],
+            parent: 'intro-title',
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 2,
+            transform: { position: { x: 0, y: 70 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'top-center', alignment: 'center', maxWidth: '70%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 20, value: 0 }, { frame: 40, value: 0.7 }] },
+            ],
+            effects: [],
+            metadata: { content: params.subtitle, fontSize: 22, fontWeight: 400, color: 'rgba(255,255,255,0.6)' },
+          },
+        ],
+      },
+      ...params.steps.map((step, i) => ({
+        id: `step-${i}`,
+        duration: 5,
+        fps: 30,
+        camera: {
+          type: 'perspective',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          zoom: 1,
+          focalLength: 50,
+        },
+        nodes: [
+          {
+            id: `step-bg-${i}`,
+            type: 'rect',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', maxWidth: '100%', maxHeight: '100%' },
+            animations: [],
+            effects: [],
+            metadata: { color: '#0D0D0D' },
+          },
+          {
+            id: `step-header-${i}`,
+            type: 'text',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: -250 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'top-center', alignment: 'center' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 0, value: 0 }, { frame: 12, value: 1 }] },
+              { property: 'position', keyframes: [{ frame: 0, value: [0, -280] }, { frame: 12, value: [0, -250] }] },
+            ],
+            effects: [],
+            metadata: { content: `Step ${i + 1}: ${step.title}`, fontSize: 28, fontWeight: 700, color: '#fff' },
+          },
+          {
+            id: `step-progress-${i}`,
+            type: 'rect',
+            children: [],
+            parent: `step-header-${i}`,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 45 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'top-center', alignment: 'center', maxWidth: '40%' },
+            animations: [
+              { property: 'scale', keyframes: [
+                { frame: 0, value: [0, 1] },
+                { frame: 30, value: [(i + 1) / params.steps.length, 1] },
+              ] },
+            ],
+            effects: [],
+            metadata: { color: params.brandColor, height: 3, borderRadius: 2 },
+          },
+          ...(step.code
+            ? [
+                {
+                  id: `step-code-${i}`,
+                  type: 'rect',
+                  children: [],
+                  parent: null,
+                  visible: true,
+                  blendMode: 'normal',
+                  opacity: 1,
+                  zIndex: 1,
+                  transform: { position: { x: 0, y: 20 }, rotation: 0, scale: { x: 1, y: 1 } },
+                  constraints: { anchor: 'center', alignment: 'center', maxWidth: '75%', maxHeight: '35%' },
+                  animations: [
+                    { property: 'opacity', keyframes: [{ frame: 15, value: 0 }, { frame: 30, value: 1 }] },
+                    { property: 'scale', keyframes: [{ frame: 15, value: [0.95, 0.95] }, { frame: 30, value: [1, 1] }] },
+                  ],
+                  effects: [],
+                  metadata: { color: '#1A1A2E', borderRadius: 8, borderColor: params.brandColor, borderWidth: 1 },
+                },
+                {
+                  id: `step-code-text-${i}`,
+                  type: 'text',
+                  children: [],
+                  parent: `step-code-${i}`,
+                  visible: true,
+                  blendMode: 'normal',
+                  opacity: 1,
+                  zIndex: 2,
+                  transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+                  constraints: { anchor: 'center', alignment: 'start', padding: { top: 16, right: 16, bottom: 16, left: 16 } },
+                  animations: [
+                    { property: 'opacity', keyframes: [{ frame: 20, value: 0 }, { frame: 35, value: 1 }] },
+                  ],
+                  effects: [],
+                  metadata: { content: step.code, fontSize: 14, fontWeight: 400, color: '#E0E0E0', fontFamily: 'monospace', lineHeight: 1.6 },
+                },
+              ]
+            : []),
+          {
+            id: `step-explanation-${i}`,
+            type: 'text',
+            children: [],
+            parent: step.code ? `step-code-${i}` : null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 3,
+            transform: {
+              position: { x: 0, y: step.code ? 200 : 20 },
+              rotation: 0,
+              scale: { x: 1, y: 1 },
+            },
+            constraints: { anchor: 'top-center', alignment: 'center', maxWidth: '70%' },
+            animations: [
+              {
+                property: 'opacity',
+                keyframes: [{ frame: step.code ? 30 : 10, value: 0 }, { frame: step.code ? 50 : 30, value: 1 }],
+              },
+            ],
+            effects: [],
+            metadata: { content: step.explanation, fontSize: 20, fontWeight: 400, color: 'rgba(255,255,255,0.8)' },
+          },
+        ],
+      })),
+      {
+        id: 'outro',
+        duration: 3,
+        fps: 30,
+        camera: {
+          type: 'perspective',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          zoom: 1,
+          focalLength: 50,
+        },
+        nodes: [
+          {
+            id: 'outro-bg',
+            type: 'rect',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', maxWidth: '100%', maxHeight: '100%' },
+            animations: [],
+            effects: [{ type: 'bloom', params: { intensity: 0.2 }, order: 0 }],
+            metadata: { color: params.brandColor },
+          },
+          {
+            id: 'outro-check',
+            type: 'text',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: -30 }, rotation: 0, scale: { x: 0, y: 0 } },
+            constraints: { anchor: 'center', alignment: 'center' },
+            animations: [
+              { property: 'scale', keyframes: [{ frame: 0, value: [0, 0] }, { frame: 15, value: [1, 1] }] },
+            ],
+            effects: [],
+            metadata: { content: '✓', fontSize: 80, fontWeight: 900, color: '#fff' },
+          },
+          {
+            id: 'outro-text',
+            type: 'text',
+            children: [],
+            parent: 'outro-check',
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 2,
+            transform: { position: { x: 0, y: 70 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'top-center', alignment: 'center', maxWidth: '80%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 10, value: 0 }, { frame: 30, value: 1 }] },
+            ],
+            effects: [],
+            metadata: { content: params.outroText ?? 'You\'re all set!', fontSize: 32, fontWeight: 700, color: '#fff' },
+          },
+        ],
+      },
+    ],
+  }
+}

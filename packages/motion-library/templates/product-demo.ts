@@ -1,0 +1,191 @@
+import { SceneGraph } from '../../video-engine/src/core/types'
+
+export interface ProductDemoParams {
+  productName: string
+  tagline: string
+  brandColor: string
+  features: Array<{ name: string; description: string }>
+  cta: string
+}
+
+export function createProductDemo(params: ProductDemoParams): Partial<SceneGraph> {
+  return {
+    scenes: [
+      {
+        id: 'intro',
+        duration: 3,
+        fps: 30,
+        camera: {
+          type: 'perspective',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          zoom: 1,
+          focalLength: 50,
+          preset: 'push-zoom',
+        },
+        nodes: [
+          {
+            id: 'bg',
+            type: 'gradient',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', maxWidth: '100%', maxHeight: '100%' },
+            animations: [],
+            effects: [{ type: 'bloom', params: { intensity: 0.3 }, order: 0 }],
+            metadata: { colors: [params.brandColor, '#000000'] },
+          },
+          {
+            id: 'product-name',
+            type: 'text',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 2,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', alignment: 'center' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 0, value: 0 }, { frame: 20, value: 1 }] },
+              { property: 'scale', keyframes: [{ frame: 0, value: [0.8, 0.8] }, { frame: 20, value: [1, 1] }] },
+            ],
+            effects: [],
+            metadata: { content: params.productName, fontSize: 72, fontWeight: 700, color: '#fff' },
+          },
+          {
+            id: 'tagline',
+            type: 'text',
+            children: [],
+            parent: 'product-name',
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: 80 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'top-center', alignment: 'center', maxWidth: '70%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 15, value: 0 }, { frame: 30, value: 1 }] },
+            ],
+            effects: [],
+            metadata: { content: params.tagline, fontSize: 28, fontWeight: 400, color: 'rgba(255,255,255,0.7)' },
+          },
+        ],
+      },
+      ...params.features.map((f, i) => ({
+        id: `feature-${i}`,
+        duration: 4,
+        fps: 30,
+        camera: {
+          type: 'perspective',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          zoom: 1,
+          focalLength: 50,
+        },
+        nodes: [
+          {
+            id: `feature-bg-${i}`,
+            type: 'rect',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', maxWidth: '100%', maxHeight: '100%' },
+            animations: [],
+            effects: [],
+            metadata: { color: i % 2 === 0 ? '#0A0A0A' : '#111111' },
+          },
+          {
+            id: `feature-name-${i}`,
+            type: 'text',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: -50 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', alignment: 'center', maxWidth: '70%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 0, value: 0 }, { frame: 20, value: 1 }] },
+            ],
+            effects: [],
+            metadata: { content: f.name, fontSize: 48, fontWeight: 700, color: '#fff' },
+          },
+          {
+            id: `feature-desc-${i}`,
+            type: 'text',
+            children: [],
+            parent: `feature-name-${i}`,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: 70 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'top-center', alignment: 'center', maxWidth: '60%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 15, value: 0 }, { frame: 35, value: 1 }] },
+            ],
+            effects: [],
+            metadata: { content: f.description, fontSize: 22, fontWeight: 400, color: 'rgba(255,255,255,0.7)' },
+          },
+        ],
+      })),
+      {
+        id: 'cta',
+        duration: 3,
+        fps: 30,
+        camera: {
+          type: 'perspective',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          zoom: 1,
+          focalLength: 50,
+        },
+        nodes: [
+          {
+            id: 'cta-bg',
+            type: 'gradient',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 0,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', maxWidth: '100%', maxHeight: '100%' },
+            animations: [],
+            effects: [],
+            metadata: { colors: [params.brandColor, '#000000'], angle: 180 },
+          },
+          {
+            id: 'cta-text',
+            type: 'text',
+            children: [],
+            parent: null,
+            visible: true,
+            blendMode: 'normal',
+            opacity: 1,
+            zIndex: 1,
+            transform: { position: { x: 0, y: 0 }, rotation: 0, scale: { x: 1, y: 1 } },
+            constraints: { anchor: 'center', alignment: 'center', maxWidth: '80%' },
+            animations: [
+              { property: 'opacity', keyframes: [{ frame: 0, value: 0 }, { frame: 25, value: 1 }] },
+              { property: 'scale', keyframes: [{ frame: 0, value: [1.1, 1.1] }, { frame: 25, value: [1, 1] }] },
+            ],
+            effects: [],
+            metadata: { content: params.cta, fontSize: 56, fontWeight: 800, color: '#fff' },
+          },
+        ],
+      },
+    ],
+  }
+}
