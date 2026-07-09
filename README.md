@@ -1,151 +1,116 @@
-# OpenCode Video Pipeline
+# @beast-course/video-pipeline
 
-> **Autonomous, production-grade video generation for OpenCode.** A scene graph engine, motion library, 5-agent orchestration system, and 3-layer QA — all from a single `npx @opencode/video-pipeline init` command.
+**Autonomous video generation for OpenCode.** From specification to rendered MP4, the pipeline orchestrates research, creative direction, production, and quality assurance — without a GUI, without timelines, without manual keyframing.
+
+```bash
+npx @beast-course/video-pipeline init my-project
+cd my-project
+opencode
+/new-video "30-second product launch for a fintech analytics tool"
+```
 
 ---
 
-## Quick Start
+## Why this exists
 
-```bash
-# Scaffold a new video project
-npx @opencode/video-pipeline init my-video
+Video production tooling has bifurcated. On one side, professional NLEs (Premiere, After Effects, DaVinci) offer unlimited expressiveness but require hours of manual work per minute of output. On the other, template-based tools (Canva, Kapwing, Descript) trade control for speed.
 
-# Enter the project and start OpenCode
-cd my-video
-opencode
+This pipeline occupies the unexplored middle — **programmatic control without the timeline**. The scene graph is the canonical representation. Constraints handle layout across aspect ratios. Keyframes drive animation. Camera presets and effect stacks provide cinematic depth. The agent system orchestrates the creative workflow.
 
-# Start your first video
-/new-video "Create a 30-second product launch video for our new AI tool"
-```
+The result: one scene graph definition produces both 16:9 and 9:16 renders, with motion design quality enforced at every stage.
 
 ---
 
 ## Architecture
 
-```
-                    ┌─────────────┐
-                    │   Director   │  ← Orchestrates all stages
-                    └──────┬──────┘
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-   │ Research  │    │ Creative │    │Production│    │    QA    │
-   │ (facts,   │    │(story-   │    │ (Remotion│    │(3-layer  │
-   │  script)  │    │  board)  │    │  render) │    │  check)  │
-   └──────────┘    └──────────┘    └──────────┘    └──────────┘
-```
-
-### Star Topology
-
-All communication flows through **Director**. Sub-agents never talk to each other. Director:
-
-1. Reads `state/pipeline-state.json` to know where we are
-2. Dispatches the next stage with full context
-3. Evaluates output and decides retry or advance
-4. Never touches code, assets, or renders — only plans and delegates
+The system has four layers, each independently swappable.
 
 ### Scene Graph Engine
 
-The canonical representation is a **scene graph** (not React components):
+The core data model. A scene graph is a tree of typed nodes (text, rect, image, gradient, circle) arranged in scenes, each with a camera configuration and timeline. Nodes carry constraints for layout, arrays of keyframes for animation, and an effect stack for post-processing. The engine evaluates these declaratively — constraints are solved per-frame, keyframes are interpolated, effects are composited in order.
 
-- **Nodes** — text, rect, image, gradient, circle — arranged in a tree
-- **Constraints** — anchor, flex, padding, margin, aspect-ratio, percentage/vw/vh units
-- **Timelines** — per-node keyframe animations with bezier easing, loops, yoyo
-- **Camera** — 8 presets (push-zoom, orbit-pan, shake, dolly, parallax, follow, tilt, focus-pull)
-- **Effects** — 7 per-node composable effects (bloom, blur, glow, grain, chromatic-aberration, drop-shadow, color-grade)
-
-**One scene graph → any aspect ratio.** The constraint solver re-laysouts nodes for 16:9 (horizontal) and 9:16 (vertical) from the same definition.
-
----
-
-## Packages
-
-The video pipeline ships two packages under `packages/`:
-
-### `@opencode/video-engine`
-The core engine — scene graph types, constraint solver, timeline engine, camera controller, effect stack, and Remotion renderer adapter.
-
-### `@opencode/motion-library`
-Ready-to-use motion presets and configuration:
-
-| Package | Contents |
-|---------|----------|
-| **presets/** | 96 animation presets across 15 categories (fade, slide, pop, bounce, elastic, blur, counter, typing, wave, stagger, parallax, float, shake, pulse, light-sweep) |
-| **transitions/** | 17 scene transitions (crossfade, slide, zoom, whip-pan, blur, light-sweep, morph, circular-reveal, grid-reveal) |
-| **cameras/** | 8 camera movement configurations |
-| **backgrounds/** | 14 background presets (gradient, noise, lights, solid, pattern) |
-| **effects/** | 15 effect configurations |
-| **typography/captions/** | 15 caption styles, 10 animations, 7 layouts, and a caption generator |
-| **themes/** | 8 brand themes (Apple, Stripe, Linear, Raycast, Framer, Vercel, Notion, OpenAI) + custom template |
-| **ui/** | 10 UI presets (hero, cards, notifications, toasts, buttons, badges, modals, tooltips, avatars) |
-| **particles/** | 12 particle presets (sparkle, confetti, snow, fire, smoke, bubbles, stars, rain, magic-dust, embers) |
-| **svg/** | 10 SVG animation presets (morph, draw, stroke-animate, path-reveal, float) |
-| **charts/** | 7 chart presets (bar, line, pie, area, donut, radial) |
-| **loaders/** | 7 loader presets (spinner, pulse, skeleton, dots, bar, ring, wave) |
-| **reveals/** | 9 reveal animations (wipe, expand, flip, shutter, blinds) |
-| **icons/** | 10 Material-style icons (checkmark, cross, arrow, star, heart, play, pause, settings, bell, search) |
-| **scenes/** | 10 scene categories with reusable scene graph fragments |
-| **templates/** | 7 complete video templates (product-demo, explainer, social-clip, launch-teaser, tutorial, testimonial, feature-update) |
-
----
-
-## Agent System
-
-| Agent | Role | Model | Max Retries |
-|-------|------|-------|-------------|
-| **Director** | Orchestrates the pipeline | Claude Sonnet 4 (0.3 temp) | — |
-| **Research** | Gathers facts, writes script | Default | 2 |
-| **Creative** | Storyboard, motion design, captions | Default | 3 |
-| **Production** | Remotion render, asset management | Default | 3 |
-| **QA** | Structural, technical, perceptual checks | Default | 5 |
-
-### Quality Thresholds
-
-- Minimum per dimension: **75/100**
-- Minimum average: **85/100**
-- Hard-fail dimensions: **Facts**, **Rendering**
-- Global retry ceiling: **12 attempts**
-
----
-
-## Motion Design Skills
-
-Five OpenCode skills loaded by Director into Creative context:
-
-| Skill | When Loaded |
-|-------|-------------|
-| **motion-design** | Every Creative session — 12 principles, easing, timing, rhythm |
-| **visual-composition** | Every video project — hierarchy, gestalt, color psychology |
-| **cinematography** | When camera/cinematic movement specified |
-| **typography-motion** | When text-heavy or captions used |
-| **attention-psychology** | Short-form / social clips — retention patterns |
-
----
-
-## Configuration
-
-### `opencode.json`
-
-```json
-{
-  "permission": { "external_directory": "deny" },
-  "mcp": {
-    "context7": { "type": "remote", "url": "https://mcp.context7.com/mcp", "enabled": true }
-  }
-}
+```
+SceneGraph
+└── Scene (× N, each with a camera + duration)
+    └── SceneNode (× M, arranged in a parent-child tree)
+        ├── transform — position, rotation, scale
+        ├── constraints — anchor, flex, padding, margin, aspect-ratio
+        ├── animations — per-property keyframe sequences
+        └── effects — composited in order (bloom, blur, glow, grain, ...)
 ```
 
-### `state/pipeline-state.json`
+One scene graph → any aspect ratio. The constraint solver re-laysouts nodes for 16:9 (horizontal) and 9:16 (vertical) from the same definition. No safe zones, no conditional branches — the constraints express the intent, and the solver computes the layout.
 
-Tracks complete pipeline state — stages, attempts, quality scores, checkpoints, and logs. Director reads and writes this; sub-agents read it.
+### Motion Library
+
+250+ primitives organized as typed configuration objects (not React components). Each preset exports frames that the timeline engine interprets. This means the LLM generates JSON — easier to produce correctly than JSX — and the results are deterministic, testable, and portable across renderers.
+
+- **96 animation presets** across 15 categories (fade, slide, pop, bounce, elastic, blur, counter, typing, wave, stagger, parallax, float, shake, pulse, light-sweep)
+- **17 transitions** (crossfade, slide, zoom, whip-pan, blur, morph, circular-reveal, grid-reveal, and more)
+- **8 camera movement configurations** mapped to the camera engine's presets
+- **14 backgrounds** (gradient mesh, noise, lights, solid, pattern)
+- **15 effect configurations** with sensible defaults
+- **15 caption styles** with 10 animation patterns and 7 layouts, plus a generator that resolves style + animation + layout into a scene graph fragment
+- **8 brand themes** (Apple, Stripe, Linear, Raycast, Framer, Vercel, Notion, OpenAI) — each defining color palettes, typography stacks, animation philosophy, camera style, and pacing
+- **10 UI presets** (hero sections, feature cards, notifications, toasts, buttons, badges, modals, tooltips, avatars)
+- **12 particle presets** (sparkle, confetti, snow, fire, smoke, bubbles, stars, rain, magic dust, embers)
+- **10 SVG animation presets** (morph, draw, stroke-animate, path-reveal, float)
+- **7 chart presets** (bar, line, pie, area, donut, radial)
+- **10 scene composition presets** covering product showcases, testimonials, data visualization, tutorials, announcements, social clips, intros, and outros
+- **7 complete video templates** (product demo, explainer, social clip, launch teaser, tutorial, testimonial, feature update) — each returning a full `Partial<SceneGraph>` with 3–6 scenes
+
+### Agent System
+
+Five OpenCode agents in a star topology. All communication flows through Director — sub-agents never talk to each other. Director reads pipeline state, dispatches the next stage with full context, evaluates output, and decides retry or advance. It never touches code, assets, or renders.
+
+| Agent | Responsibility | Max Retries |
+|-------|---------------|-------------|
+| **Director** | Orchestrates the pipeline; reads/writes state; decides retries | — |
+| **Research** | Gathers facts, writes script with timestamped scenes | 2 |
+| **Creative** | Designs storyboard, selects motion presets, caption styles, camera moves | 3 |
+| **Production** | Runs Remotion render, manages assets | 3 |
+| **QA** | Structural checks, ffprobe analysis, perceptual review | 5 |
+
+Quality thresholds: minimum 75 per dimension, 85 average, hard-fail on Facts and Rendering. Global ceiling of 12 retries across all stages.
+
+### Motion Design Skills
+
+Five skills loaded into Creative context, encoding production motion design knowledge — not as vague guidelines but as decision trees with measurable constraints.
+
+- **motion-design** — 12 animation principles, easing theory, timing/rhythm rules, anti-patterns, agency references
+- **visual-composition** — hierarchy, gestalt principles, rule of thirds, color psychology
+- **cinematography** — camera language, depth of field, parallax, shake constraints
+- **typography-motion** — kinetic typography, font pairing, readability thresholds (minimum 2× reading time, 4.5:1 contrast ratio)
+- **attention-psychology** — hook strategies, cognitive load limits, retention drop patterns
 
 ---
 
-## Customization
+## Engine internals
 
-### Adding a Preset
+### Constraint solver
+Nodes declare layout intent via constraints, not pixel positions. The solver evaluates anchor points, flex direction, grow/shrink ratios, padding, margin, aspect ratio preservation, and percentage/vw/vh units. This is what enables one scene graph to serve multiple aspect ratios — the same constraints produce correct layouts at 1920×1080 and 1080×1920.
 
-```typescript
+### Timeline engine
+Per-node, per-property keyframe arrays. Supports scalar and vector interpolation, configurable easing (linear, ease-in, ease-out, ease-in-out, spring, elastic, bounce), custom bezier curves, delay, loop, yoyo, and loop count. The engine is stateless — given the same keyframes and frame number, it produces the same output. Deterministic by design.
+
+### Camera engine
+Eight presets (push-zoom, orbit-pan, shake, dolly, parallax, follow, tilt, focus-pull). Each is a function `(camera, progress) → camera` that mutates position, rotation, zoom, focal length, or depth of field over time. The CameraController applies the preset and then projects the camera state onto scene nodes as 2D transforms.
+
+### Effect stack
+Seven renderers (bloom, blur, glow, grain, chromatic-aberration, drop-shadow, color-grade) applied per-node in order. Each is a Canvas2D function that receives the rendering context and effect parameters. Effects are composited sequentially — a node can have bloom + glow + grain, each independently configured.
+
+### 3-layer QA
+- **Layer 1 — structural:** compares render manifest against blueprint for scene count, duration drift, caption fidelity, node completeness
+- **Layer 2 — technical:** ffprobe analysis for resolution (≥1080p), codec (H.264), audio presence, frame rate (≥24fps)
+- **Layer 3 — perceptual:** extracts one JPEG per scene at given timestamps for human or AI visual review
+
+---
+
+## Extending
+
+### Adding a preset
+
+```ts
 // packages/motion-library/presets/my-custom.ts
 export const myCustomPresets = [
   {
@@ -158,55 +123,79 @@ export const myCustomPresets = [
 ]
 ```
 
-Then register it in `packages/motion-library/presets/index.ts`.
+Register it in `packages/motion-library/presets/index.ts`.
 
-### Creating a Theme
+### Creating a theme
 
-```typescript
-// packages/motion-library/themes/my-brand.ts
-import { BrandTheme } from './index'
+```ts
+import { BrandTheme } from '../themes'
+
 export const myBrand: BrandTheme = {
   name: 'my-brand',
-  // ... fill in all BrandTheme fields
+  colorPalette: { primary: '#...', secondary: '#...', /* ... */ },
+  typography: { fonts: { heading: 'Inter', body: 'Inter', mono: 'JetBrains Mono' }, /* ... */ },
+  animationPhilosophy: { defaultEasing: 'ease-out', defaultDuration: 0.6, /* ... */ },
+  cameraStyle: { defaultPreset: 'push-zoom', movement: 'minimal', depth: true },
+  pacing: { sceneLength: 4, beatInterval: 2, hookDuration: 3 },
 }
 ```
 
-### Adding a Template
+### Building a template
 
-```typescript
-// packages/motion-library/templates/my-video.ts
+Templates are functions that receive typed parameters and return a `Partial<SceneGraph>`. They compose scenes from nodes, each with its own constraints, animations, and effects.
+
+```ts
 import { SceneGraph } from '@opencode/video-engine'
+
 export function createMyVideo(params: MyParams): Partial<SceneGraph> {
-  // Return scene graph with scenes and nodes
+  return {
+    scenes: [
+      {
+        id: 'intro',
+        duration: 3,
+        fps: 30,
+        camera: { /* ... */ },
+        nodes: [ /* ... */ ],
+      },
+    ],
+  }
 }
 ```
-
----
-
-## Quality Assurance
-
-Three layers of automated QA:
-
-1. **Structural QA** (`scripts/qa-manifest.js`) — Compares render manifest against blueprint: scene count, timing, caption fidelity, visual completeness
-2. **Technical QA** (`scripts/qa-ffprobe.js`) — Uses ffprobe to check resolution, codec, audio, duration, frame rate
-3. **Keyframe Extraction** (`scripts/extract-keyframes.js`) — Extracts frame-per-scene JPEGs for human/AI perceptual review
 
 ---
 
 ## Development
 
 ```bash
-# Install dependencies
-npm install
+npm install              # Install dependencies
+npx vitest run           # Run all 111 tests
+npx tsc --noEmit         # Type-check the entire project
+```
 
-# Run tests
-npx vitest run
+To render a video (requires Remotion and ffmpeg):
 
-# Render a video
+```bash
 npx remotion render packages/video-engine/src/renderers/remotion/Root.tsx Scene out/render.mp4
+```
 
-# Run QA
-node scripts/qa-ffprobe.js out/render.mp4
+---
+
+## Project structure
+
+```
+packages/
+├── video-engine/        → Core: types, serialization, constraint solver,
+│                           timeline engine, camera controller, effect stack,
+│                           Remotion renderer adapter
+├── motion-library/      → Presets: 96 animations, 17 transitions, 8 cameras,
+│                           14 backgrounds, 15 effects, 15 caption styles,
+│                           10 animations, 7 layouts, 8 themes, 10 UI presets,
+│                           12 particle presets, 10 SVG animations, 7 charts,
+│                           7 loaders, 9 reveals, 10 icons, 10 scene comps,
+│                           7 templates
+├── .opencode/           → Agent definitions, motion design skills, commands
+├── scripts/             → QA scripts (structural, ffprobe, keyframe extraction)
+├── src/                 → CLI scaffold generator
 ```
 
 ---
