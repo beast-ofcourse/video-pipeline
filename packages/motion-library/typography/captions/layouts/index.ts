@@ -1,0 +1,7 @@
+export { singleLineCenter } from './single-line-center'
+export { multiLineLeft } from './multi-line-left'
+export { multiLineCenter } from './multi-line-center'
+export { bottomThird } from './bottom-third'
+export { splitLayout } from './split-layout'
+export { fullScreen } from './full-screen'
+export { twoColumn } from './two-column'
